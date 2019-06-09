@@ -24,10 +24,11 @@ void sbar_show(PSTATUS sbar, int amount, int end) {
 	if (sbar->prog_old != sbar->progress) {
 		x = sbar->progress;
 		sbar->prog_old = x;
-		for (i = 1; i < 48; i++) {
-			if (x > i) txt[i] += '=';
-			else txt[i] += ' ';
+		for (i = 1; i < 50; i++) {
+			if (x > i) sbar->txt[i] = '=';
+			else sbar->txt[i] = ' ';
 		}
-		fwrite(txt, 1, 48, stderr);
+		fwrite(sbar->txt, 1, 48, stderr);
+		fflush(stderr);
 	}
 }
