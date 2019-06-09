@@ -9,7 +9,7 @@ typedef struct {
 } ISYNTH, *PSYNTH;
 
 PSYNTH synth_create(double lfo_hz) {
-	PYSNTH syn;
+	PSYNTH syn;
 	syn = (PSYNTH) malloc(sizeof(ISYNTH));
 
 	syn->phase = 0.0;

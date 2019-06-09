@@ -30,13 +30,13 @@ int main() {
 			}
 		}
 
-		sam = synth_walk(syn, incsyn);
+		sam = synth_walk(syn);
 
 		if (sam < -1.0) sam = -1.0;
 		if (sam > 1.0) sam = 1.0;
-		out = (short)(sam * 32767.0);
-		fwrite(&out, 2, 1, stdout);
-		fwrite(&out, 2, 1, stdout);
+		pcm = (short)(sam * 32767.0);
+		fwrite(&pcm, 2, 1, stdout);
+		fwrite(&pcm, 2, 1, stdout);
 		fflush(stdout);
 	}
 

@@ -16,7 +16,7 @@ wf.setframerate(96000)
 wf.setsampwidth(2)
 wf.setnchannels(2)
 
-subprocess.Popen(["gcc", f + ".c", "-o", "sing", "-O2"]).wait()
+subprocess.Popen(["gcc", f + ".c", "-o", "sing", "-lm", "-O2"]).wait()
 p = subprocess.Popen(["./sing"], stdout=subprocess.PIPE)
 
 c = 8
