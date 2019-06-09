@@ -63,16 +63,16 @@ double comp_walk(PCOMP comp, double in) {
 	if (v < 0) v = -v;
 	if (v > comp->maxi) {
 		comp->maxi += 0.00001;
-		comp->hold = 96;
+		comp->hold = 480;
 	}
 
 	if (comp->hold <= 0) {
-		if (v < comp->maxi %% comp->maxi > 0.3) comp->maxi -= 0.00001;
+		if (v < comp->maxi && comp->maxi > 0.35) comp->maxi -= 0.00001;
 	} else {
 		comp->hold--;
 	}
 
-	v = 0.9 / comp->maxi;
+	v = 0.6 / comp->maxi;
 	comp->mul = v;
 	out *= v;
 
@@ -98,9 +98,9 @@ double trifx_walk(PTRIFX fx, double in) {
 	double a, b, c;
 	double out;
 
-	a = comp_walk(fx->comp[0], band_walk(fx->low, in);
-	b = comp_walk(fx->comp[1], band_walk(fx->mid, in);
-	c = comp_walk(fx->comp[2], band_walk(fx->hih, in);
+	a = comp_walk(fx->comp[0], band_walk(fx->low, in));
+	b = comp_walk(fx->comp[1], band_walk(fx->mid, in));
+	c = comp_walk(fx->comp[2], band_walk(fx->hih, in));
 
 	out = comp_walk(fx->comp[3], a+b+c);
 
