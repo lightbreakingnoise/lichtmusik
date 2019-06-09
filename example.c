@@ -16,11 +16,14 @@ int main() {
 	PTRIFX tri = trifx_create();
 	PSYNTH syn = synth_create(1.7);
 	syn->inc = saw_TABLE[24];
+	PECHO echo = echo_create();
+	int eln = (int)(song->step * 3.0);
 
 	double sam;
 	double lo = 0.0;
 	double q = 0.02;
 	double qd = 0.3;
+	double vmul = 0.9998;
 	int c = 0;
 
 	while (c < FIN) {
@@ -29,22 +32,25 @@ int main() {
 
 			if (c % 8 == 0) {
 				syn->inc = saw_TABLE[24];
-				syn->vol = 1.0;
-				qd = 0.3;
+				syn->vol = 0.2;
+				qd = 0.1;
+				vmul = 0.9998;
 			}
 			if (c % 8 == 1) qd = 0.02;
 
 			if (c % 8 == 3) {
 				syn->inc = saw_TABLE[21];
-				syn->vol = 1.0;
+				syn->vol = 0.2;
 				qd = 0.3;
+				vmul = 0.99999;
 			}
-			if (c % 8 == 4) qd = 0.02;
+			if (c % 8 == 5) qd = 0.02;
 
 			if (c % 8 == 6) {
 				syn->inc = saw_TABLE[19];
-				syn->vol = 1.0;
-				qd = 0.3;
+				syn->vol = 0.2;
+				qd = 0.2;
+				vmul = 0.9997;
 			}
 			if (c % 8 == 7) qd = 0.02;
 
@@ -55,11 +61,11 @@ int main() {
 		sam = trifx_walk(tri, sam);
 
 		lo -= (lo - sam) * q;
-		sam = lo;
+		sam = lo;//echo_walk(echo, lo, eln);
 
 		m2s(sam);
 
-		syn->vol *= 0.9998;
+		syn->vol *= vmul;
 		q = ((511.0 * q) + qd) / 512.0;
 
 		fwrite(&m2s_lft, 2, 1, stdout);

@@ -18,6 +18,12 @@ typedef struct {
 	PCOMP comp[4];
 } ITRIFX, *PTRIFX;
 
+typedef struct {
+	double lo;
+	double hi;
+	double *buf;
+} IECHO, *PECHO;
+
 PBAND band_create(double cutoff_lo, double cutoff_hi) {
 	PBAND band;
 	band = (PBAND) malloc(sizeof(IBAND));
@@ -60,7 +66,7 @@ double comp_walk(PCOMP comp, double in) {
 
 	double v;
 	v = out;
-	if (v < 0) v = -v;
+	if (v < 0.0) v = -v;
 	if (v > comp->maxi) {
 		comp->maxi += 0.00001;
 		comp->hold = 480;
@@ -102,7 +108,38 @@ double trifx_walk(PTRIFX fx, double in) {
 	b = comp_walk(fx->comp[1], band_walk(fx->mid, in));
 	c = comp_walk(fx->comp[2], band_walk(fx->hih, in));
 
-	out = comp_walk(fx->comp[3], a+b+c);
+	out = comp_walk(fx->comp[3], (a+b+c) / 3.0);
+
+	return out;
+}
+
+PECHO echo_create() {
+	PECHO echo;
+	echo = (PECHO) malloc(sizeof(IECHO));
+	echo->buf = (double*) malloc(sizeof(double) * 96000);
+
+	echo->lo = 0.0;
+	echo->hi = 0.0;
+	memset(echo->buf, 0, sizeof(double) * 96000);
+
+	return echo;
+}
+
+double echo_walk(PECHO echo, double in, int len) {
+	double out;
+	double sam;
+	out = echo->buf[0];
+
+	memcpy(echo->buf, &echo->buf[1], sizeof(double)*len);
+	sam = (out * 0.65) + (in * 0.2);
+
+	echo->lo -= (echo->lo - sam) * 0.3;
+	sam = echo->lo;
+	echo->hi += (sam - echo->hi) * 0.3;
+	sam -= echo->hi;
+	echo->buf[len] = sam;
+
+	out += in;
 
 	return out;
 }

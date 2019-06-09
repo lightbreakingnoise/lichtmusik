@@ -1,5 +1,5 @@
 typedef struct {
-	double phase;
+	double phase[5];
 	double inc;
 	double vol;
 	double lfo_phase;
@@ -12,7 +12,9 @@ PSYNTH synth_create(double lfo_hz) {
 	PSYNTH syn;
 	syn = (PSYNTH) malloc(sizeof(ISYNTH));
 
-	syn->phase = 0.0;
+	int i;
+	for (i = 0; i < 5; i++)
+		syn->phase[i] = 0.0;
 	syn->inc = 0.0;
 	syn->vol = 1.0;
 	syn->lfo_phase = 0.0;
@@ -25,21 +27,29 @@ PSYNTH synth_create(double lfo_hz) {
 
 double synth_walk(PSYNTH syn) {
 	double out;
+	double inc;
+	int i;
 
-	out = syn->phase - 1.0;
-	syn->phase += syn->inc + (0.01 * sin(syn->lfo_phase) * syn->inc);
-	if (syn->phase > 2.0)
-		syn->phase -= 2.0;
+	out = 0.0;
+	inc = syn->inc;
+	for (i = 0; i < 5; i++) {
+		out += (syn->phase[i] - 1.0);
+		syn->phase[i] += inc + (0.01 * sin(syn->lfo_phase) * inc);
+		inc *= 1.002;
+		if (syn->phase[i] > 2.0)
+			syn->phase[i] -= 2.0;
+	}
+	out /= 5.0;
 
 	syn->lfo_phase += syn->lfo_inc;
 	if (syn->lfo_phase > DP)
 		syn->lfo_phase -= DP;
 
 	double q;
-	q = 0.1;
+	q = 0.05;
 
 	if (syn->c < 24)
-		q = 0.5;
+		q = 0.25;
 
 	syn->lo -= (syn->lo - out) * q;
 	out = syn->lo * syn->vol;
