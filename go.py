@@ -4,7 +4,10 @@ import time
 import sys
 
 if len(sys.argv) != 2:
-	print("usage: python3 go.py folder")
+	print("usage: python3 go.py songfile-basename")
+	print("example:")
+	print("$ python3 go.py 001")
+	print("compiles 001.c and saves it as Song-001.wav")
 	quit()
 
 f = sys.argv[1]
@@ -13,7 +16,7 @@ wf.setframerate(96000)
 wf.setsampwidth(2)
 wf.setnchannels(2)
 
-subprocess.Popen(["gcc", f + "/song.c", "-o", "sing", "-O2"]).wait()
+subprocess.Popen(["gcc", f + ".c", "-o", "sing", "-O2"]).wait()
 p = subprocess.Popen(["./sing"], stdout=subprocess.PIPE)
 
 c = 8
@@ -34,4 +37,3 @@ while True:
 		c = 8
 
 wf.close()
-
