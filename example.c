@@ -6,7 +6,7 @@
 #include "statusbar.h"
 #include "fx.h"
 
-#define FIN 256
+#define FIN 800
 
 int main() {
 	tune_create();
@@ -14,8 +14,12 @@ int main() {
 	PSTATUS stat = sbar_create();
 	PSONG song = song_create(125.0);
 	PTRIFX tri = trifx_create();
-	PSYNTH syn = synth_create(1.7);
+	PSYNTH syn = synth_create(1.7, 3);
 	syn->inc = saw_TABLE[24];
+	PSYNTH bass = synth_create(8.0, 1);
+	bass->inc = saw_TABLE[4];
+	PSYNTH lead = synth_create(1.0, 5);
+	lead->inc = saw_TABLE[48];
 	PECHO echo = echo_create((int)(song->step * 3.0));
 
 	double sam;
@@ -53,10 +57,36 @@ int main() {
 			}
 			if (c % 8 == 7) qd = 0.02;
 
+			if (c % 8 == 0)
+				bass->vol = 0.5;
+			if (c % 8 == 2)
+				bass->vol = 0.7;
+			if (c % 8 == 4)
+				bass->vol = 0.5;
+			if (c % 8 == 7)
+				bass->vol = 0.7;
+
+			if (c % 64 == 0)
+				bass->inc = saw_TABLE[4];
+			if (c % 64 == 60)
+				bass->inc = saw_TABLE[9];
+
+			if (c % 32 < 8)
+				lead->vol = 0.3;
+
+			if (c % 3 == 0)
+				lead->inc = saw_TABLE[48];
+			if (c % 3 == 1)
+				lead->inc = saw_TABLE[50];
+			if (c % 3 == 2)
+				lead->inc = saw_TABLE[53];
+
 			sbar_show(stat, c, FIN);
 		}
 
 		sam = synth_walk(syn);
+		if (c >= 192) sam += synth_walk(bass);
+		if (c >= 384) sam += synth_walk(lead);
 		sam = trifx_walk(tri, sam);
 
 		lo -= (lo - sam) * q;
@@ -66,6 +96,8 @@ int main() {
 
 		syn->vol *= vmul;
 		q = ((511.0 * q) + qd) / 512.0;
+		bass->vol *= 0.9999;
+		lead->vol *= 0.9997;
 
 		fwrite(&m2s_lft, 2, 1, stdout);
 		fwrite(&m2s_rgt, 2, 1, stdout);
