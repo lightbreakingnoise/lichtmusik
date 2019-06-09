@@ -28,7 +28,7 @@ double synth_walk(PSYNTH syn) {
 
 	out = syn->phase - 1.0;
 	syn->phase += syn->inc + (0.01 * sin(syn->lfo_phase) * syn->inc);
-	if (syn->phase > 1.0)
+	if (syn->phase > 2.0)
 		syn->phase -= 2.0;
 
 	syn->lfo_phase += syn->lfo_inc;
@@ -36,15 +36,15 @@ double synth_walk(PSYNTH syn) {
 		syn->lfo_phase -= DP;
 
 	double q;
-	q = 0.01;
+	q = 0.1;
 
-	if (syn->c < 8)
-		q = 0.1;
+	if (syn->c < 24)
+		q = 0.5;
 
 	syn->lo -= (syn->lo - out) * q;
 	out = syn->lo * syn->vol;
 
-	syn->c = (syn->c + 1) % 12;
+	syn->c = (syn->c + 1) % 32;
 
 	return out;
 }

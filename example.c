@@ -8,6 +8,7 @@ int main() {
 
 	PSONG song = song_create(125.0);
 	PSYNTH syn = synth_create(1.7);
+	syn->inc = saw_TABLE[24];
 
 	double sam;
 	short pcm;
@@ -31,6 +32,7 @@ int main() {
 		}
 
 		sam = synth_walk(syn);
+		syn->vol *= 0.9998;
 
 		if (sam < -1.0) sam = -1.0;
 		if (sam > 1.0) sam = 1.0;
