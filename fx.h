@@ -106,8 +106,8 @@ double trifx_walk(PTRIFX fx, double in) {
 	double a, b, c;
 	double out;
 
-	a = comp_walk(fx->comp[0], band_walk(fx->low, in));
-	b = comp_walk(fx->comp[1], band_walk(fx->mid, in));
+	a = 3.0 * comp_walk(fx->comp[0], band_walk(fx->low, in));
+	b = 0.8 * comp_walk(fx->comp[1], band_walk(fx->mid, in));
 	c = comp_walk(fx->comp[2], band_walk(fx->hih, in));
 
 	out = comp_walk(fx->comp[3], (a+b+c) / 3.0);
