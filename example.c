@@ -3,6 +3,7 @@
 #include "synth.h"
 #include "tune.h"
 #include "m2s.h"
+#include "statusbar.h"
 
 int main() {
 	tune_create();
@@ -38,9 +39,11 @@ int main() {
 		syn->vol *= 0.9998;
 
 		fwrite(&m2s_lft, 2, 1, stdout);
-		fwrite(&m2s_rgt 2, 1, stdout);
+		fwrite(&m2s_rgt, 2, 1, stdout);
 		fflush(stdout);
 	}
+
+	fwrite("\n", 1, 1, stderr);
 
 	return 0;
 }
