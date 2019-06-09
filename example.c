@@ -16,8 +16,7 @@ int main() {
 	PTRIFX tri = trifx_create();
 	PSYNTH syn = synth_create(1.7);
 	syn->inc = saw_TABLE[24];
-	PECHO echo = echo_create();
-	int eln = (int)(song->step * 3.0);
+	PECHO echo = echo_create((int)(song->step * 3.0));
 
 	double sam;
 	double lo = 0.0;
@@ -61,7 +60,7 @@ int main() {
 		sam = trifx_walk(tri, sam);
 
 		lo -= (lo - sam) * q;
-		sam = lo;//echo_walk(echo, lo, eln);
+		sam = echo_walk(echo, lo);
 
 		m2s(sam);
 

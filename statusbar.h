@@ -25,8 +25,8 @@ void sbar_show(PSTATUS sbar, int amount, int end) {
 		x = sbar->progress;
 		sbar->prog_old = x;
 		for (i = 1; i < 50; i++) {
-			if (x > i) sbar->txt[i] = '=';
-			else sbar->txt[i] = ' ';
+			if (x > i) sbar->txt[i] = '#';
+			else sbar->txt[i] = '_';
 		}
 		fwrite(sbar->txt, 1, 48, stderr);
 		fflush(stderr);
