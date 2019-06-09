@@ -2,21 +2,22 @@
 #include "song.h"
 #include "synth.h"
 #include "tune.h"
+#include "m2s.h"
 
 int main() {
 	tune_create();
 
+	PSTATUS stat = sbar_create();
 	PSONG song = song_create(125.0);
 	PSYNTH syn = synth_create(1.7);
 	syn->inc = saw_TABLE[24];
 
-	double sam;
-	short pcm;
 	int c = 0;
 
 	while (c < 1024) {
 		if (song_walk(song) == 1) {
 			c = song->c;
+
 			if (c % 8 == 0) {
 				syn->inc = saw_TABLE[24];
 				syn->vol = 1.0;
@@ -29,16 +30,15 @@ int main() {
 				syn->inc = saw_TABLE[19];
 				syn->vol = 1.0;
 			}
+
+			sbar_show(stat, c, 1024);
 		}
 
-		sam = synth_walk(syn);
+		m2s(synth_walk(syn));
 		syn->vol *= 0.9998;
 
-		if (sam < -1.0) sam = -1.0;
-		if (sam > 1.0) sam = 1.0;
-		pcm = (short)(sam * 32767.0);
-		fwrite(&pcm, 2, 1, stdout);
-		fwrite(&pcm, 2, 1, stdout);
+		fwrite(&m2s_lft, 2, 1, stdout);
+		fwrite(&m2s_rgt 2, 1, stdout);
 		fflush(stdout);
 	}
 
