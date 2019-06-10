@@ -12,6 +12,7 @@ typedef struct {
 	double decer;
 	double mul;
 	double vol;
+	int fin;
 } IBDRUM, *PBDRUM;
 
 PHAT hihat_create() {
@@ -58,7 +59,7 @@ PBDRUM bdrum_create() {
 	bd->decer = 0.0;
 	bd->mul = 0.85;
 	bd->vol = 0.8;
-
+	bd->fin = 24000;
 	return bd;
 }
 
@@ -68,6 +69,7 @@ void bdrum_set(PBDRUM bd) {
 	bd->mul = 0.85;
 	bd->decer = (bd->inc * bd->mul) / 8.0;
 	bd->vol = 0.4;
+	bd->fin = 24000;
 }
 
 double bdrum_walk(PBDRUM bd, double in) {
@@ -78,13 +80,13 @@ double bdrum_walk(PBDRUM bd, double in) {
 		return out;
 
 	double val;
-	val = 1.0 - (bd->vol * 0.5);
+	val = 1.0 - (bd->vol * 0.3);
 
 	double sam;
 	sam = 0.5 * bd->vol * sin(bd->phase);
 
-	if (bd->pos > 24000)
-		bd->vol *= 0.99975;
+	if (bd->pos > bd->fin)
+		bd->vol *= 0.9995;
 	else
 		bd->vol *= 0.99997;
 

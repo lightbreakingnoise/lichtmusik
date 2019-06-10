@@ -12,6 +12,10 @@
 int main() {
 	tune_create();
 
+	memset(m2s_buf, 0, sizeof(double) * 256);
+	m2s_lft_mul = 1.0;
+	m2s_rgt_mul = 1.0;
+
 	PSTATUS stat = sbar_create();
 	PSONG song = song_create(125.0);
 	PTRIFX tri = trifx_create();
@@ -32,6 +36,7 @@ int main() {
 	double q = 0.02;
 	double qd = 0.3;
 	double vmul = 0.9998;
+	int shortener = 24000;
 	int okt = 0;
 	int c = 0;
 
@@ -44,7 +49,7 @@ int main() {
 
 			if (c % 8 == 0) {
 				syn->inc = saw_TABLE[24 + okt];
-				syn->vol = 0.2;
+				syn->vol = 0.4;
 				qd = 0.1;
 				vmul = 0.9998;
 			}
@@ -60,7 +65,7 @@ int main() {
 
 			if (c % 8 == 6) {
 				syn->inc = saw_TABLE[19 + okt];
-				syn->vol = 0.2;
+				syn->vol = 0.4;
 				qd = 0.3;
 				vmul = 0.9997;
 			}
@@ -90,12 +95,19 @@ int main() {
 			if (c % 3 == 2)
 				lead->inc = saw_TABLE[53];
 
-			if (c % 4 == 0)
+			if (c % 4 == 0) {
 				bdrum_set(bd);
+				if (c < 256)
+					bd->fin = 1000;
+				if (c >= 512) {
+					if (shortener > 200) shortener -= 200;
+					bd->fin = shortener;
+				}
+			}
 
 			if (c % 4 == 2) {
 				hat->atk = 0.2;
-				hat->vol = 0.3;
+				hat->vol = 0.5;
 			}
 			if (c % 4 == 3)
 				hat->vol = 0.0;
@@ -113,18 +125,28 @@ int main() {
 		lo -= (lo - sam) * q;
 		sam = lo;
 
-		sam = trifx_walk(tri, sam);
 		sam += (htsam * 0.2);
 		sam = echo_walk(echo, sam);
 		sam += (htsam * 0.8);
 		sam = bdrum_walk(bd, sam);
 
+		sam = trifx_walk(tri, sam);
 		m2s(sam);
 
 		syn->vol *= vmul;
-		q = ((511.0 * q) + qd) / 512.0;
+		q = ((511.0 * q) + qd + qd) / 512.0;
 		bass->vol *= 0.9999;
 		lead->vol *= 0.9997;
+
+		fwrite(&m2s_lft, 2, 1, stdout);
+		fwrite(&m2s_rgt, 2, 1, stdout);
+		fflush(stdout);
+	}
+
+	for (c = 0; c < 512000; c++) {
+		sam = echo_walk(echo, 0.0);
+		sam = trifx_walk(tri, sam);
+		m2s(sam);
 
 		fwrite(&m2s_lft, 2, 1, stdout);
 		fwrite(&m2s_rgt, 2, 1, stdout);

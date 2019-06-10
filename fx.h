@@ -16,6 +16,7 @@ typedef struct {
 	PBAND mid;
 	PBAND hih;
 	PCOMP comp[4];
+	double hi;
 } ITRIFX, *PTRIFX;
 
 typedef struct {
@@ -70,17 +71,17 @@ double comp_walk(PCOMP comp, double in) {
 	v = out;
 	if (v < 0.0) v = -v;
 	if (v > comp->maxi) {
-		comp->maxi += 0.00001;
-		comp->hold = 480;
+		comp->maxi += 0.00005;
+		comp->hold = 240;
 	}
 
 	if (comp->hold <= 0) {
-		if (v < comp->maxi && comp->maxi > 0.35) comp->maxi -= 0.00001;
+		if (v < comp->maxi && comp->maxi > 0.35) comp->maxi -= 0.00002;
 	} else {
 		comp->hold--;
 	}
 
-	v = 0.6 / comp->maxi;
+	v = 0.8 / comp->maxi;
 	comp->mul = v;
 	out *= v;
 
@@ -98,6 +99,7 @@ PTRIFX trifx_create() {
 	fx->low = band_create(400.0, 20.0);
 	fx->mid = band_create(6000.0, 400.0);
 	fx->hih = band_create(20000.0, 6000.0);
+	fx->hi = 0.0;
 
 	return fx;
 }
@@ -105,6 +107,11 @@ PTRIFX trifx_create() {
 double trifx_walk(PTRIFX fx, double in) {
 	double a, b, c;
 	double out;
+
+	fx->hi += (out - fx->hi) * 0.35;
+	out -= fx->hi;
+	out *= 3.5;
+	out += in;
 
 	a = 3.0 * comp_walk(fx->comp[0], band_walk(fx->low, in));
 	b = 0.8 * comp_walk(fx->comp[1], band_walk(fx->mid, in));
