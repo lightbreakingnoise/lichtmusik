@@ -142,9 +142,9 @@ double echo_walk(PECHO echo, double in) {
 	out = buf[pos];
 	sam = out + (in * 0.75);
 
-	echo->lo -= (echo->lo - sam) * 0.35;
+	echo->lo -= (echo->lo - sam) * 0.25;
 	sam = echo->lo;
-	echo->hi += (sam - echo->hi) * 0.15;
+	echo->hi += (sam - echo->hi) * 0.05;
 	sam -= echo->hi;
 	buf[pos] = sam;
 
