@@ -7,7 +7,7 @@
 #include "fx.h"
 #include "drums.h"
 
-#define FIN 1024
+#define FIN 1280
 
 int main() {
 	tune_create();
@@ -32,14 +32,18 @@ int main() {
 	double q = 0.02;
 	double qd = 0.3;
 	double vmul = 0.9998;
+	int okt = 0;
 	int c = 0;
 
 	while (c < FIN) {
 		if (song_walk(song) == 1) {
 			c = song->c;
 
+			if (c >= 256 && c % 64 == 0) okt = 12;
+			if (c >= 256 && c % 64 == 32) okt = 0;
+
 			if (c % 8 == 0) {
-				syn->inc = saw_TABLE[24];
+				syn->inc = saw_TABLE[24 + okt];
 				syn->vol = 0.2;
 				qd = 0.1;
 				vmul = 0.9998;
@@ -47,17 +51,17 @@ int main() {
 			if (c % 8 == 1) qd = 0.02;
 
 			if (c % 8 == 3) {
-				syn->inc = saw_TABLE[21];
+				syn->inc = saw_TABLE[21 + okt];
 				syn->vol = 0.2;
-				qd = 0.3;
+				qd = 0.2;
 				vmul = 0.99999;
 			}
 			if (c % 8 == 5) qd = 0.02;
 
 			if (c % 8 == 6) {
-				syn->inc = saw_TABLE[19];
+				syn->inc = saw_TABLE[19 + okt];
 				syn->vol = 0.2;
-				qd = 0.2;
+				qd = 0.3;
 				vmul = 0.9997;
 			}
 			if (c % 8 == 7) qd = 0.02;
