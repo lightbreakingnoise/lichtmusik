@@ -56,7 +56,7 @@ PBDRUM bdrum_create() {
 	bd->phase = 0.0;
 	bd->inc = (DP / SR) * 12000.0;
 	bd->decer = 0.0;
-	bd->mul = 0.7;
+	bd->mul = 0.85;
 	bd->vol = 0.8;
 
 	return bd;
@@ -65,26 +65,26 @@ PBDRUM bdrum_create() {
 void bdrum_set(PBDRUM bd) {
 	bd->pos = 0;
 	bd->inc = (DP / SR) * 12000.0;
-	bd->mul = 0.7;
+	bd->mul = 0.85;
 	bd->decer = (bd->inc * bd->mul) / 8.0;
-	bd->vol = 0.8;
+	bd->vol = 0.4;
 }
 
 double bdrum_walk(PBDRUM bd, double in) {
 	double out;
 	out = in;
 
-	if (bd->pos >= 28000)
+	if (bd->pos >= 34000)
 		return out;
 
 	double val;
-	val = 1.0 - (bd->vol * 0.3);
+	val = 1.0 - (bd->vol * 0.5);
 
 	double sam;
 	sam = 0.5 * bd->vol * sin(bd->phase);
 
 	if (bd->pos > 24000)
-		bd->vol *= 0.99885;
+		bd->vol *= 0.99975;
 	else
 		bd->vol *= 0.99997;
 
@@ -95,10 +95,12 @@ double bdrum_walk(PBDRUM bd, double in) {
 	double wavlen;
 	wavlen = DP / bd->inc;
 	bd->decer = (bd->inc * bd->mul) / wavlen;
-	if (bd->pos < 4000) {
-		bd->mul -= (0.68 / 4000.0);
-		bd->vol += (0.6 / 5000.0);
+	if (bd->pos < 2600) {
+		bd->mul -= (0.82 / 2600.0);
+		bd->vol += (0.4 / 2600.0);
 	}
+	if (bd->pos < 6000)
+		bd->vol += (0.6 / 6000.0);
 
 	bd->inc -= bd->decer;
 	bd->pos++;
